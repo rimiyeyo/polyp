@@ -103,5 +103,3 @@ class UNet(nn.Module):
 
         out = self.final(d1)
         return self.sigmoid(out)
-
-unet_model = UNet() 

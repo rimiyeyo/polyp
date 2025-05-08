@@ -1,15 +1,18 @@
-# 필요 라이브러리 로딩
 from __future__ import absolute_import, division, print_function
 
 import os
 
 import matplotlib as mpl
+import torch
 import torch.nn.functional as F
+import torch.optim as optim
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from torchvision.transforms import functional as F
 
 from loader import SegDataset
+from models import UNet
+from trainer import train_model
 
 DATASET_PATH = os.path.join("/mnt/d/proj/vivapoly/data")
 
@@ -43,3 +46,13 @@ test_dataloader = DataLoader(test_dataset,
                              shuffle=False,
                              num_workers=1,
                              pin_memory=True)
+
+model = UNet()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+train_model(train_dataloader, test_dataloader, model, optimizer, max_epochs=50)
+
+device = 'cuda'
+checkpoint = torch.load("best_unet.pth", map_location=device)
+model.load_state_dict(checkpoint)
+
+if __name__ == '__main__':

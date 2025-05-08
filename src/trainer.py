@@ -1,4 +1,10 @@
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
 from tqdm import tqdm
+
+from losses import bce_dice_loss
+from utils import get_cosine_scheduler
 
 device = 'cuda'
 
@@ -48,5 +54,3 @@ def train_model(train_loader: DataLoader,
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             torch.save(model.state_dict(), 'best_unet.pth')
-            
-train_model(train_dataloader, test_dataloader, model, optimizer, max_epochs=50)
