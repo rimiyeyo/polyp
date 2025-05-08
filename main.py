@@ -56,3 +56,4 @@ checkpoint = torch.load("best_unet.pth", map_location=device)
 model.load_state_dict(checkpoint)
 
 if __name__ == '__main__':
+    pass
