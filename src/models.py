@@ -57,13 +57,9 @@ class DecoderBlock(nn.Module):
         self.conv_block = ConvBlockR(num_filters *2, num_filters) ##
 
     def forward(self, x, skip):
-        print('input', x.shape)
         x = self.upconv(x)
-        print('2d', x.shape)
         x = self.bn(x)
         x = self.relu(x)
-        print('xxx', x.shape)
-        print('sss', skip.shape)
         x = torch.cat([x, skip], dim=1)
         x = self.conv_block(x)
         return x

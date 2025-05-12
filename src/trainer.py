@@ -1,12 +1,16 @@
 import torch
 import torch.nn as nn
+import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+from data import PROJECT_ROOT
+from loader import test_dataloader, train_dataloader
 from losses import bce_dice_loss
+from models import UNet
 from utils import get_cosine_scheduler
 
-device = 'cuda'
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def train_model(train_loader: DataLoader,
                 val_loader: DataLoader,
@@ -16,9 +20,10 @@ def train_model(train_loader: DataLoader,
     # Initialize scheduler
     scheduler = get_cosine_scheduler(optimizer, max_epochs)
     best_val_loss = float('inf')
+    model = model.to(device)
+    model.train()
 
     for epoch in tqdm(range(1, max_epochs + 1)):
-        model.train()
         train_loss = 0.0
         for images, masks in tqdm(train_loader):
             images = images.to(device)
@@ -53,4 +58,9 @@ def train_model(train_loader: DataLoader,
         # Save best model on validation
         if val_loss < best_val_loss:
             best_val_loss = val_loss
-            torch.save(model.state_dict(), 'best_unet.pth')
+            torch.save(model.state_dict(), f"{PROJECT_ROOT}/data/train_ckpt/best_unet.pth")
+
+if __name__ == '__main__':   
+    model = UNet()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    train_model(train_dataloader, test_dataloader, model, optimizer, max_epochs=50)
